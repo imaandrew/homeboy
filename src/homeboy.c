@@ -111,7 +111,7 @@ static void do_read()
     }
 }
 
-#if IS_OOT
+#if (IS_OOT || IS_PM)
 #define ADDR_OFFSET 0x08050000
 #else 
 #define ADDR_OFFSET 0x100A0000

@@ -13,9 +13,11 @@
 #define NACE 1
 #define NARJ 2
 #define NARE 3
+#define NAEJ 4
 
 #define IS_MM   (VC_VERSION == NARJ || VC_VERSION == NARE)
 #define IS_OOT  (VC_VERSION == NACJ || VC_VERSION == NACE)
+#define IS_PM   VC_VERSION == NAEJ
 
 #define ENTRY   __attribute__((section(".init")))
 
@@ -56,7 +58,7 @@ typedef struct{
     sh_t        sh;                 /* 0x20 */
     sw_t        sw;                 /* 0x24 */
     sd_t        sd;                 /* 0x28 */
-#if IS_OOT
+#if (IS_OOT || IS_PM)
     unk_2c_t    unk_0x2C;           /* 0x2C */
     uint32_t    n64_vram_start;     /* 0x30 */
     uint32_t    n64_vram_end;       /* 0x34 */
@@ -181,6 +183,22 @@ struct gClassCPU_s {
     uint32_t            prev_loadstore_base;        /* 0x121A8 */
     char                unk_0x121AC[0x14];          /* 0x121AC */
 };                                                  /* 0x121C0 */
+
+#elif IS_PM
+
+typedef struct {
+    char        unk_0x00[0x18];
+    gClassCPU_t  *cpu;
+} gClassSystem_t;
+
+struct gClassCPU_s {
+    char        unk_0x00_[0xB60];
+    cpu_dev_t  *cpu_devs[0x100];
+    uint8_t     dev_idx[0x100000];
+    void       *recompiler_1;
+    void       *recompiler_2;
+    char        unk_0x10F68[0x1370];
+};
 #endif
 
 typedef struct {
@@ -346,6 +364,39 @@ struct thread_context_s {
 #define OSCreateThread_addr     0x8009afbc
 #define OSResumeThread_addr     0x8009b624
 #define OSSuspendThread_addr    0x8009b8bc
+#elif VC_VERSION == NAEJ
+#define init_hook_addr          0x800079bc
+#define ios_openasync_addr      0x800bf5ac
+#define ios_open_addr           0x800bf6c4
+#define ios_closeasync_addr     0x800bf7e4
+#define ios_close_addr          0x800bf8a4
+#define ios_readasync_addr      0x800bf94c
+#define ios_read_addr           0x800c1e08
+#define ios_writeasync_addr     0x800bfb54
+#define ios_write_addr          0x800c1ecc
+#define ios_seekasync_addr      0x800bfd5c
+#define ios_seek_addr           0x800c1d78
+#define ios_ioctlasync_addr     0x800bff24
+#define ios_ioctl_addr          0x800c005c
+#define ios_ioctlvasync_addr    0x800c02c8
+#define ios_ioctlv_addr         0x800c03ac
+#define ios_create_heap_addr    0x800c0570
+#define ios_alloc_addr          0x800c08a4
+#define ios_free_addr           0x800c08a8
+#define ramSetSize_addr         0x80041754
+#define xlHeapTake_addr         0x80085f48
+#define heap_size_hook_addr     0x8008f778
+#define reset_flag_addr         0x80246C7C
+#define gSystem_ptr_addr        0x80246B64
+#define N64_DRAM_SIZE           0x00800000
+#define cpuMapObject_addr       0x8003c58c
+#define xlObjectMake_addr       0x8008703c
+#define cpuSetDevicePut_addr    0x8003c750
+#define cpuSetDeviceGet_addr    0x8003c738
+#define xlHeapFree_addr         0x800861b4
+#define OSCreateThread_addr     0x80098154
+#define OSResumeThread_addr     0x800987bc
+#define OSSuspendThread_addr    0x80098a54
 #endif
 
 #define cur_thread_addr         0x800000C0
