@@ -1,0 +1,43 @@
+name: Build homeboy patches
+on:
+  push:
+    branches: [fp_support]
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install prerequisite packages
+        run: |
+          curl https://practicerom.com/public/packages/debian/pgp.pub | sudo apt-key add -
+          echo deb https://practicerom.com/public/packages/debian ./staging main | sudo tee /etc/apt/sources.list.d/practicerom.list
+          sudo apt-get update
+          sudo apt-get install wii-toolchain
+      - name: Make patches patches
+        run: |
+          make -j16 hb-NAEE hb-NAEJ
+      - name: Upload JP patch
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: hb-NAEJ.bin
+          path: bin/hb-NAEJ/homeboy.bin
+      - name: Upload US patch
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: hb-NAEE.bin
+          path: bin/hb-NAEE/homeboy.bin
+      - name: Set up S3cmd
+        if: github.event_name == 'release'
+        uses: s3-actions/s3cmd@v1.5.0
+        with:
+          provider: aws
+          region: 'ca-central-1'
+          access_key: ${{ secrets.S3_ACCESS_KEY }}
+          secret_key: ${{ secrets.S3_SECRET_KEY }}
+      - name: Upload patches to bucket
+        if: github.event_name == 'release'
+        run: |
+          s3cmd put bin/hb-NAEE/homeboy.bin --acl-public s3://fp-web-patcher-files/hb/NAEE.bin
+          s3cmd put bin/hb-NAEJ/homeboy.bin --acl-public s3://fp-web-patcher-files/hb/NAEJ.bin
