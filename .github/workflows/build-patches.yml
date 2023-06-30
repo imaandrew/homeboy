@@ -39,5 +39,5 @@ jobs:
       - name: Upload patches to bucket
         if: github.event_name == 'release'
         run: |
-          s3cmd put bin/hb-NAEE/homeboy.bin --acl-public s3://fp-web-patcher-files/hb/NAEE.bin
-          s3cmd put bin/hb-NAEJ/homeboy.bin --acl-public s3://fp-web-patcher-files/hb/NAEJ.bin
+          s3cmd put bin/hb-NAEE/homeboy.bin s3://fp-web-patcher-files/hb/NAEE.bin
+          s3cmd put bin/hb-NAEJ/homeboy.bin s3://fp-web-patcher-files/hb/NAEJ.bin
