@@ -15,7 +15,7 @@ jobs:
           echo deb https://practicerom.com/public/packages/debian ./staging main | sudo tee /etc/apt/sources.list.d/practicerom.list
           sudo apt-get update
           sudo apt-get install wii-toolchain
-      - name: Make patches patches
+      - name: Make patches
         run: |
           make -j16 hb-NAEE hb-NAEJ
       - name: Upload JP patch
